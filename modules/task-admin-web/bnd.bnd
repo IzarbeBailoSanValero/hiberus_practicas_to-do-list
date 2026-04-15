@@ -1,0 +1,7 @@
+Bundle-Name: task-admin-web
+Bundle-SymbolicName: task.admin.web
+Bundle-Version: 1.0.0
+Export-Package: task.admin.web.constants
+Provide-Capability:\
+	liferay.language.resources;\
+		resource.bundle.base.name="content.Language"

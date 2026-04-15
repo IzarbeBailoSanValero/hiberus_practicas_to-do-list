@@ -1,0 +1,4 @@
+Bundle-Name: task-user-web
+Bundle-SymbolicName: task.user.web
+Bundle-Version: 1.0.0
+Export-Package: task.user.web.constants

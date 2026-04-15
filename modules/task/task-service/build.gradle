@@ -1,0 +1,11 @@
+dependencies {
+	compileOnly project(":modules:task:task-api")
+
+	compileOnly group: "com.liferay.portal", name: "release.portal.api"
+}
+
+buildService {
+	apiDir = "../task-api/src/main/java"
+}
+
+group = "es.test"

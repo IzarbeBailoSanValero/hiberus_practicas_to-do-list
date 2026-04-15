@@ -1,0 +1,9 @@
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "release.portal.api"
+	
+	compileOnly project(":modules:task:task-api")
+	
+	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib.clay", version: "3.0.0"
+
+	cssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "3.1.0"
+}

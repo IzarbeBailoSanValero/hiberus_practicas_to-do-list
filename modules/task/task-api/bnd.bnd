@@ -1,0 +1,10 @@
+Bundle-Name: task-api
+Bundle-SymbolicName: es.test.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	es.test.exception,\
+	es.test.model,\
+	es.test.service,\
+	es.test.service.persistence
+-check: EXPORTS
+-includeresource: META-INF/service.xml=../task-service/service.xml
