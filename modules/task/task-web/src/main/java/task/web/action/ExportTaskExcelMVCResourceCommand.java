@@ -2,6 +2,7 @@ package task.web.action;
 
 
 
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletResponseUtil;
@@ -9,14 +10,19 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.osgi.service.component.annotations.Component;
@@ -26,9 +32,6 @@ import es.test.model.Task;
 import es.test.service.TaskLocalService;
 import task.web.constants.TaskWebPortletKeys;
 import task.web.util.ExcelUtil;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 
 @Component(immediate = true, property = { "javax.portlet.name=" + TaskWebPortletKeys.TASKWEB,
@@ -47,7 +50,16 @@ public class ExportTaskExcelMVCResourceCommand extends BaseMVCResourceCommand {
 		_log.info("ENTRA EN EXPORT EXCEL");
 
 		// 1. Cabeceras de columnas , Lista simple con los nombres de las columnas
-		List<String> headers = Arrays.asList("ID", "Title", "Description", "Status", "Due date");
+		
+		//locale para poder acceder desde java al language properties
+		Locale locale = resourceRequest.getLocale();
+
+		List<String> headers = Arrays.asList(
+		    LanguageUtil.get(locale, "task.export.id"),
+		    LanguageUtil.get(locale, "task.export.title"),
+		    LanguageUtil.get(locale, "task.export.status"),
+		    LanguageUtil.get(locale, "task.export.date")
+		);
 
 		// 2. obtener las tareas y convertirlas en filas para excel
 
