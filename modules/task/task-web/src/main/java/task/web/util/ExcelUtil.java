@@ -30,339 +30,330 @@ import org.apache.poi.xssf.usermodel.*;
  *
  * Apache POI permite crear, leer y modificar Excel desde Java.
  *
- * Diferencias importantes:
- * - XLS  (antiguo) usa HSSF
- * - XLSX (moderno) usa XSSF (el que se usa aquí)
+ * Diferencias importantes: - XLS (antiguo) usa HSSF - XLSX (moderno) usa XSSF
+ * (el que se usa aquí)
  *
  * Estructura de un Excel en POI:
  *
- * XSSFWorkbook  -> representa el archivo completo Excel
- * XSSFSheet     -> representa una hoja (pestaña)
- * XSSFRow       -> representa una fila
- * XSSFCell      -> representa una celda
+ * XSSFWorkbook -> representa el archivo completo Excel XSSFSheet -> representa
+ * una hoja (pestaña) XSSFRow -> representa una fila XSSFCell -> representa una
+ * celda
  */
 public class ExcelUtil {
 
-    private static final Log _log = LogFactoryUtil.getLog(ExcelUtil.class);
+	private static final Log _log = LogFactoryUtil.getLog(ExcelUtil.class);
 
-    private ExcelUtil() {
-    }
+	private ExcelUtil() {
+	}
 
-    /**
-     * Genera un Excel plantilla con cabeceras y lo envía al navegador.
-     */
-    public static void exportTemplate(ResourceRequest resourceRequest, ResourceResponse resourceResponse, String templateName, List<String> headers) {
-        try {
-            XSSFWorkbook excel = excelHeader(resourceRequest, headers);
+	/**
+	 * Genera un Excel plantilla con cabeceras y lo envía al navegador.
+	 */
+	public static void exportTemplate(ResourceRequest resourceRequest, ResourceResponse resourceResponse,
+			String templateName, List<String> headers) {
+		try {
+			XSSFWorkbook excel = excelHeader(resourceRequest, headers);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            // Convierte el Excel a bytes para enviarlo
-            excel.write(baos);
+			// Convierte el Excel a bytes para enviarlo
+			excel.write(baos);
 
-            baos.flush();
-            baos.close();
+			baos.flush();
+			baos.close();
 
-            ServletResponseUtil.sendFile(
-                PortalUtil.getHttpServletRequest(resourceRequest),
-                PortalUtil.getHttpServletResponse(resourceResponse),
-                templateName,
-                baos.toByteArray(),
-                "application/download"
-            );
+			ServletResponseUtil.sendFile(PortalUtil.getHttpServletRequest(resourceRequest),
+					PortalUtil.getHttpServletResponse(resourceResponse), templateName, baos.toByteArray(),
+					"application/download");
 
-        } catch (Exception e) {
-            _log.error(e, e);
-        }
-    }
+		} catch (Exception e) {
+			_log.error(e, e);
+		}
+	}
 
-    /**
+	/**
      * Traduce cabeceras usando los ficheros de idioma de Liferay.
      */
     public static List<String> getColumnNamesMap(PortletRequest portletRequest, List<String> headers) {
-        List<String> list = new ArrayList();
+        List<String> list = new ArrayList<>();
+        
+        ResourceBundle bundle =ResourceBundle.getBundle(ExcelUtilConstants.CONTENT_LANGUAGE, portletRequest.getLocale());
 
         for (String header : headers) {
-            list.add(LanguageUtil.get(
-                ResourceBundle.getBundle("content/Language", portletRequest.getLocale()),
-                header
-            ));
+            list.add(LanguageUtil.get(bundle,header));
         }
 
         return list;
     }
 
-    /**
-     * Crea un Excel con solo la fila de cabeceras.
-     */
-    public static XSSFWorkbook excelHeader(ResourceRequest actionRequest, List<String> headers) {
-
-        // Representa el archivo Excel completo en memoria
-        XSSFWorkbook excel = new XSSFWorkbook();
-
-        // Representa una hoja dentro del Excel
-        XSSFSheet excelSheet = excel.createSheet();
-        excel.setSheetName(0, "Datos");
-
-        // Fuente de las cabeceras
-        XSSFFont font = excel.createFont();
-        font.setBold(true);
-        font.setFontHeight((double) 10.0F);
-        font.setFontName("Asap");
-
-        // Estilo de las celdas de cabecera
-        XSSFCellStyle cellStyle = excel.createCellStyle();
-        cellStyle.setFont(font);
-
-        // Permite múltiples líneas en la celda
-        cellStyle.setWrapText(true);
-
-        // Alineaciones
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+	/**
+	 * Crea un Excel con solo la fila de cabeceras.
+	 */
+	public static XSSFWorkbook excelHeader(ResourceRequest actionRequest, List<String> headers) {
+
+		// Representa el archivo Excel completo en memoria
+		XSSFWorkbook excel = new XSSFWorkbook();
+
+		// Representa una hoja dentro del Excel
+		XSSFSheet excelSheet = excel.createSheet();
+		excel.setSheetName(0, "Datos");
 
-        // Añade bordes
-        setStyleAllBorders(cellStyle);
+		// Fuente de las cabeceras
+		XSSFFont font = excel.createFont();
+		font.setBold(true);
+		font.setFontHeight((double) 10.0F);
+		font.setFontName("Asap");
+
+		// Estilo de las celdas de cabecera
+		XSSFCellStyle cellStyle = excel.createCellStyle();
+		cellStyle.setFont(font);
 
-        // Color de fondo gris
-        XSSFColor color = new XSSFColor(Color.decode("#C0C0C0"), new DefaultIndexedColorMap());
-        cellStyle.setFillForegroundColor(color);
-        cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        // Fila de cabecera
-        XSSFRow row = excelSheet.createRow(0);
-
-        // Altura mayor para cabeceras
-        row.setHeightInPoints(44.25F);
-
-        // Crear cada celda de cabecera
-        for (int column = 0; column < headers.size(); ++column) {
-
-            // Ancho fijo de columna
-            excelSheet.setColumnWidth(column, 5000);
-
-            createStringCell(
-                row,
-                cellStyle,
-                column,
-                LanguageUtil.get(
-                    ResourceBundle.getBundle("content/Language", actionRequest.getLocale()),
-                    headers.get(column)
-                )
-            );
-        }
+		// Permite múltiples líneas en la celda
+		cellStyle.setWrapText(true);
 
-        // Formato de datos (texto)
-        DataFormat fmt = excel.createDataFormat();
+		// Alineaciones
+		cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+		cellStyle.setAlignment(HorizontalAlignment.CENTER);
 
-        CellStyle textStyle = excel.createCellStyle();
+		// Añade bordes
+		setStyleAllBorders(cellStyle);
 
-        // "@" indica formato texto en Excel
-        textStyle.setDataFormat(fmt.getFormat("@"));
-
-        // Aplicar formato texto a todas las columnas
-        for (int column = 0; column < headers.size(); ++column) {
-            excelSheet.setDefaultColumnStyle(column, textStyle);
-        }
+		// Color de fondo gris
+		XSSFColor color = new XSSFColor(Color.decode("#C0C0C0"), new DefaultIndexedColorMap());
+		cellStyle.setFillForegroundColor(color);
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-        return excel;
-    }
+		// Fila de cabecera
+		XSSFRow row = excelSheet.createRow(0);
 
-    /**
-     * Lee las cabeceras de la primera fila.
-     */
-    public static List<String> getExcelHeaders(Sheet sheet) {
-        List<String> headersList = new ArrayList();
-
-        Row row = sheet.getRow(0);
+		// Altura mayor para cabeceras
+		row.setHeightInPoints(44.25F);
 
-        if (row != null) {
-            boolean blankCell = false;
-            int index = 0;
+		// Crear cada celda de cabecera
+		for (int column = 0; column < headers.size(); ++column) {
+
+			// Ancho fijo de columna
+			excelSheet.setColumnWidth(column, 5000);
 
-            while (!blankCell) {
-                Cell cell = row.getCell(index);
+			createStringCell(row, cellStyle, column, LanguageUtil
+					.get(ResourceBundle.getBundle("content/Language", actionRequest.getLocale()), headers.get(column)));
+		}
 
-                if (cell != null) {
-                    try {
-                        headersList.add(cell.getStringCellValue());
-                    } catch (NumberFormatException e) {
-                        headersList.add(String.valueOf(cell.getNumericCellValue()));
-                    }
-                    index++;
-                } else {
-                    blankCell = true;
-                }
-            }
-        }
+		// Formato de datos (texto)
+		DataFormat fmt = excel.createDataFormat();
 
-        return headersList;
-    }
+		CellStyle textStyle = excel.createCellStyle();
 
-    /**
-     * Valida que las cabeceras coincidan con las esperadas.
-     */
-    public static boolean validateExcelHeaders(ActionRequest actionRequest, List<String> excelHeaders, List<String> columnNames, List<String> msgs) {
+		// "@" indica formato texto en Excel
+		textStyle.setDataFormat(fmt.getFormat("@"));
 
-        if (excelHeaders == null) return false;
+		// Aplicar formato texto a todas las columnas
+		for (int column = 0; column < headers.size(); ++column) {
+			excelSheet.setDefaultColumnStyle(column, textStyle);
+		}
 
-        boolean isValid = true;
+		return excel;
+	}
 
-        List<String> structureHeaders = new ArrayList();
-        structureHeaders.addAll(columnNames);
+	/**
+	 * Lee las cabeceras de la primera fila.
+	 */
+	public static List<String> getExcelHeaders(Sheet sheet) {
+		List<String> headersList = new ArrayList();
 
-        if (excelHeaders.size() != columnNames.size()) {
-            msgs.add("La plantilla no está actualizada");
-            return false;
-        }
+		Row row = sheet.getRow(0);
 
-        for (int i = 0; i < excelHeaders.size(); ++i) {
+		if (row != null) {
+			boolean blankCell = false;
+			int index = 0;
 
-            String header = excelHeaders.get(i);
+			while (!blankCell) {
+				Cell cell = row.getCell(index);
 
-            if (header.equals(structureHeaders.get(i))) {
+				if (cell != null) {
+					try {
+						headersList.add(cell.getStringCellValue());
+					} catch (NumberFormatException e) {
+						headersList.add(String.valueOf(cell.getNumericCellValue()));
+					}
+					index++;
+				} else {
+					blankCell = true;
+				}
+			}
+		}
 
-                if (excelHeaders.lastIndexOf(header) > i) {
-                    msgs.add("Cabecera duplicada: " + header);
-                    isValid = false;
-                } else if (header.length() == 0) {
-                    msgs.add("Cabecera vacía en columna " + (i + 1));
-                    isValid = false;
-                }
+		return headersList;
+	}
 
-            } else {
-                msgs.add("Cabecera incorrecta en columna " + (i + 1));
-                isValid = false;
-            }
-        }
+	/**
+	 * Valida que las cabeceras coincidan con las esperadas.
+	 */
+	public static boolean validateExcelHeaders(ActionRequest actionRequest, List<String> excelHeaders,
+			List<String> columnNames, List<String> msgs) {
 
-        return isValid;
-    }
+		if (excelHeaders == null)
+			return false;
 
-    /**
-     * Elimina filas vacías al final del Excel.
-     */
-    public static Sheet removeTrailingEmptyRows(Sheet sheet) {
+		boolean isValid = true;
 
-        while (true) {
+		List<String> structureHeaders = new ArrayList();
+		structureHeaders.addAll(columnNames);
 
-            Row lastRow = sheet.getRow(sheet.getLastRowNum());
+		if (excelHeaders.size() != columnNames.size()) {
+			msgs.add("La plantilla no está actualizada");
+			return false;
+		}
 
-            boolean nonBlankRowFound = false;
+		for (int i = 0; i < excelHeaders.size(); ++i) {
 
-            if (lastRow != null && lastRow.getFirstCellNum() >= 0) {
-                for (int c = lastRow.getFirstCellNum(); c <= lastRow.getLastCellNum(); ++c) {
-                    Cell cell = lastRow.getCell(c);
+			String header = excelHeaders.get(i);
 
-                    if (cell != null && cell.getCellType() != CellType.BLANK) {
-                        nonBlankRowFound = true;
-                        break;
-                    }
-                }
-            }
+			if (header.equals(structureHeaders.get(i))) {
 
-            if (nonBlankRowFound) break;
+				if (excelHeaders.lastIndexOf(header) > i) {
+					msgs.add("Cabecera duplicada: " + header);
+					isValid = false;
+				} else if (header.length() == 0) {
+					msgs.add("Cabecera vacía en columna " + (i + 1));
+					isValid = false;
+				}
 
-            sheet.removeRow(lastRow);
-        }
+			} else {
+				msgs.add("Cabecera incorrecta en columna " + (i + 1));
+				isValid = false;
+			}
+		}
 
-        return sheet;
-    }
+		return isValid;
+	}
 
-    /**
-     * Exporta un Excel con datos.
-     */
-    public static XSSFWorkbook exportexcel(ResourceRequest actionRequest, List<String> headers, Map<String, Object[]> content) {
+	/**
+	 * Elimina filas vacías al final del Excel.
+	 */
+	public static Sheet removeTrailingEmptyRows(Sheet sheet) {
 
-        XSSFWorkbook excel = excelHeader(actionRequest, headers);
+		while (true) {
 
-        XSSFSheet sheet = excel.getSheetAt(0);
+			Row lastRow = sheet.getRow(sheet.getLastRowNum());
 
-        int rowid = 1;
+			boolean nonBlankRowFound = false;
 
-        for (String key : content.keySet()) {
+			if (lastRow != null && lastRow.getFirstCellNum() >= 0) {
+				for (int c = lastRow.getFirstCellNum(); c <= lastRow.getLastCellNum(); ++c) {
+					Cell cell = lastRow.getCell(c);
 
-            XSSFRow row = sheet.createRow(rowid++);
-            Object[] objectArr = content.get(key);
+					if (cell != null && cell.getCellType() != CellType.BLANK) {
+						nonBlankRowFound = true;
+						break;
+					}
+				}
+			}
 
-            int cellid = 0;
+			if (nonBlankRowFound)
+				break;
 
-            for (Object obj : objectArr) {
+			sheet.removeRow(lastRow);
+		}
 
-                Cell cell = row.createCell(cellid++);
+		return sheet;
+	}
 
-                // Se asume que todos los valores son String
-                cell.setCellValue((String) obj);
-            }
-        }
+	/**
+	 * Exporta un Excel con datos.
+	 */
+	public static XSSFWorkbook exportexcel(ResourceRequest actionRequest, List<String> headers,
+			Map<String, Object[]> content) {
 
-        return excel;
-    }
+		XSSFWorkbook excel = excelHeader(actionRequest, headers);
 
-    /**
-     * Obtiene los valores de una fila.
-     */
-    public static List<String> getExcelRowValues(Row row, List<String> headers) {
+		XSSFSheet sheet = excel.getSheetAt(0);
 
-        ArrayList<String> values = new ArrayList();
+		int rowid = 1;
 
-        for (int i = 0; i < headers.size(); ++i) {
+		for (String key : content.keySet()) {
 
-            String value = "";
+			XSSFRow row = sheet.createRow(rowid++);
+			Object[] objectArr = content.get(key);
 
-            try {
-                Cell cell = row.getCell(i);
+			int cellid = 0;
 
-                if (cell != null) {
+			for (Object obj : objectArr) {
 
-                    if (cell.getCellType() == CellType.NUMERIC) {
-                        BigDecimal bd = BigDecimal.valueOf(cell.getNumericCellValue());
-                        value = String.valueOf(bd);
-                    } else {
-                        value = cell.getStringCellValue().trim();
-                    }
-                }
+				Cell cell = row.createCell(cellid++);
 
-            } catch (Exception e) {
-                _log.error("Error en fila " + (row.getRowNum() + 1) + ", columna " + (i + 1));
-            }
+				// Se asume que todos los valores son String
+				cell.setCellValue((String) obj);
+			}
+		}
 
-            values.add(value);
-        }
+		return excel;
+	}
 
-        return values;
-    }
+	/**
+	 * Obtiene los valores de una fila.
+	 */
+	public static List<String> getExcelRowValues(Row row, List<String> headers) {
 
-    /**
-     * Convierte una fila en JSON.
-     */
-    public static JSONObject getExcelValues(List<String> fieldNames, List<String> excelRowValues) {
+		ArrayList<String> values = new ArrayList();
 
-        JSONObject excelValues = JSONFactoryUtil.createJSONObject();
+		for (int i = 0; i < headers.size(); ++i) {
 
-        for (int i = 0; i < excelRowValues.size(); ++i) {
-            excelValues.put(fieldNames.get(i), excelRowValues.get(i));
-        }
+			String value = "";
 
-        return excelValues;
-    }
+			try {
+				Cell cell = row.getCell(i);
 
-    /**
-     * Aplica bordes a una celda.
-     */
-    private static void setStyleAllBorders(XSSFCellStyle cellStyle) {
-        cellStyle.setBorderTop(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-    }
+				if (cell != null) {
 
-    /**
-     * Crea una celda tipo String con estilo.
-     */
-    public static void createStringCell(XSSFRow row, XSSFCellStyle cellStyle, int column, String value) {
-        XSSFCell cell = row.createCell(column, CellType.STRING);
-        cell.setCellStyle(cellStyle);
-        cell.setCellValue(value);
-    }
+					if (cell.getCellType() == CellType.NUMERIC) {
+						BigDecimal bd = BigDecimal.valueOf(cell.getNumericCellValue());
+						value = String.valueOf(bd);
+					} else {
+						value = cell.getStringCellValue().trim();
+					}
+				}
+
+			} catch (Exception e) {
+				_log.error("Error en fila " + (row.getRowNum() + 1) + ", columna " + (i + 1));
+			}
+
+			values.add(value);
+		}
+
+		return values;
+	}
+
+	/**
+	 * Convierte una fila en JSON.
+	 */
+	public static JSONObject getExcelValues(List<String> fieldNames, List<String> excelRowValues) {
+
+		JSONObject excelValues = JSONFactoryUtil.createJSONObject();
+
+		for (int i = 0; i < excelRowValues.size(); ++i) {
+			excelValues.put(fieldNames.get(i), excelRowValues.get(i));
+		}
+
+		return excelValues;
+	}
+
+	/**
+	 * Aplica bordes a una celda.
+	 */
+	private static void setStyleAllBorders(XSSFCellStyle cellStyle) {
+		cellStyle.setBorderTop(BorderStyle.THIN);
+		cellStyle.setBorderRight(BorderStyle.THIN);
+		cellStyle.setBorderBottom(BorderStyle.THIN);
+		cellStyle.setBorderLeft(BorderStyle.THIN);
+	}
+
+	/**
+	 * Crea una celda tipo String con estilo.
+	 */
+	public static void createStringCell(XSSFRow row, XSSFCellStyle cellStyle, int column, String value) {
+		XSSFCell cell = row.createCell(column, CellType.STRING);
+		cell.setCellStyle(cellStyle);
+		cell.setCellValue(value);
+	}
 }
