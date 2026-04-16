@@ -12,6 +12,8 @@ public class TaskWebPortletKeys {
     public static final String COMPLETE = "/task/complete";
     public static final String ADD = "/task/add";
     public static final String DELETE = "/task/delete";
+    public static final String EXPORT_EXCEL = "/task/export_excel";
+    
 
     // render
     public static final String CREATE_FORM = "/task/create_form";

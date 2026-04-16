@@ -15,6 +15,8 @@
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import= "com.liferay.portal.kernel.util.Constants" %>
 
+<%@ page import="task.web.constants.TaskWebPortletKeys" %>
+
 
 <liferay-theme:defineObjects /><!-- esto me da acceso al themedisplay, renderrequest, renderresponse... -->
 

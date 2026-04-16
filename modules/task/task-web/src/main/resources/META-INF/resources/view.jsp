@@ -138,6 +138,35 @@
 	</liferay-ui:search-container>
 </div>
 
+<!-- OPCIÓN PARA EXPORTAR A PDR Y DESCARGAR -->
+
+<portlet:resourceURL 
+    var="exportExcelURL" 
+    id="<%= TaskWebPortletKeys.EXPORT_EXCEL %>" />
+
+<!-- un resourceURL funciona como una petición GET, y un <a> dispara GET de forma natural. -->
+<a href="${exportExcelURL}" target="_blank" class="btn btn-primary">Exportar Excel</a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <aui:script>
 //liferayprovide: regstra la funcion, hace que cargue cuando liferay este listo.
 
