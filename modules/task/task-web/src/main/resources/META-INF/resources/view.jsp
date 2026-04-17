@@ -1,5 +1,17 @@
 <%@ include file="init.jsp"%>
 
+<!-- CONFIGURACIÓN DE SISTEMA (no puedo llamarla solo config porque choca con una que se crea automaticamente portletcongif en defineobject)-->
+<%
+SystemConfig systemConfig = (SystemConfig) request.getAttribute(SystemConfig.class.getName());
+
+String miParagraph = "";
+
+if (systemConfig != null) {
+    miParagraph = systemConfig.systemParagraph();
+}
+%>
+
+<h4>Escrito desde System settings: <%= miParagraph %></h4>
 
 <!-- RECUPERAR DATOS DEL RENDERCOMMAND + LEER LAS PREFERENCIAS DEL SITE (lo casteo porque devuelve Object)-->
 <%

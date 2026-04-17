@@ -7,7 +7,22 @@ dependencies {
 
 	cssBuilder group: "com.liferay", name: "com.liferay.css.builder", version: "3.1.0"
 	
+	//Excel librería
 	compileOnly group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.3'
-	
 	compileOnly group: 'org.apache.poi', name: 'poi',version: '5.2.3'
+	
+	//Configuración a distintos niveles
+	    // Anotaciones @Meta.OCD, @Meta.AD, @ExtendedObjectClassDefinition:
+    compileOnly group: 'biz.aQute.bnd', name: 'biz.aQute.bndlib', version: "5.3.0"
+ 
+    // API ConfigurationProvider (leer configuraciones por scope):
+    compileOnly group: 'com.liferay',
+                name: 'com.liferay.portal.configuration.metatype.api'
+ 
+    // Portal kernel (ThemeDisplay, Portal, etc.):
+    compileOnly group: 'com.liferay.portal', name: 'com.liferay.portal.kernel'
+ 
+    // JSR-286 (PortletPreferences, si se usan):
+    compileOnly group: 'javax.portlet', name: 'portlet-api'
+	
 }

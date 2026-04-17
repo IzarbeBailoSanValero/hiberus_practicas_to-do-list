@@ -5,3 +5,8 @@ Export-Package: task.web.constants
 Provide-Capability:\
 	liferay.language.resources;\
 		resource.bundle.base.name="content.Language"
+		
+# Sin esta linea, BND no procesa @Meta.OCD y la config NO aparece en la UI de System Settings / Instance Settings:
+# Genera los ficheros XML en OSGI-INF/metatype/ a partir de las interfaces anotadas con @Meta.OCD.
+-metatype: *
+		

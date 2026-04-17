@@ -32,6 +32,7 @@ import es.test.model.Task;
 import es.test.service.TaskLocalService;
 import task.web.constants.TaskWebPortletKeys;
 import task.web.util.ExcelUtil;
+import task.web.util.ExcelUtilConstants;
 
 
 @Component(immediate = true, property = { "javax.portlet.name=" + TaskWebPortletKeys.TASKWEB,
@@ -79,7 +80,9 @@ public class ExportTaskExcelMVCResourceCommand extends BaseMVCResourceCommand {
 		        String.valueOf(t.getTaskId()),  
 		        t.getTitle(),
 		        t.getDescription(),
-		        t.getCompleted() ? "Done" : "Pending",
+		        t.getCompleted()
+		        ? ExcelUtilConstants.TASK_STATUS_DONE
+		        : ExcelUtilConstants.TASK_STATUS_PENDING,
 		        t.getDueDate() != null ? t.getDueDate().toString() : ""
 		    });
 		}
