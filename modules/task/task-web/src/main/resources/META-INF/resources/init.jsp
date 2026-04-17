@@ -17,6 +17,7 @@
 
 <%@ page import="task.web.constants.TaskWebPortletKeys" %>
 <%@ page import="task.web.configuration.SystemConfig" %>
+<%@ page import="task.web.configuration.GroupConfig" %>
 
 
 

@@ -4,7 +4,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -23,6 +22,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import es.test.model.Task;
 import es.test.service.TaskLocalService;
+import task.web.configuration.GroupConfig;
 import task.web.configuration.SystemConfig;
 import task.web.constants.TaskWebPortletKeys;
 
@@ -41,13 +41,15 @@ public class TaskListMVCRenderCommand implements MVCRenderCommand {
 	private ConfigurationProvider _configurationProvider; // Servicio central de Liferay para leer configs de todos los
 															// scopes. Inyectado por OSGi.
 
+
+
 	@Override
 	public String render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException {
 		_log.info("entro en el render");
 
 		// 1. LEO LAS PREFERENCIAS DE CONFIGURACIÓN DEL PORTLET
 		PortletPreferences preferences = renderRequest.getPreferences();
-		String portletTitle = preferences.getValue("portletTitle", "Gestión de Tareas");
+		String portletTitle = preferences.getValue("portletTitle", "portlet.title");
 		int tasksPerPage = Integer.parseInt(preferences.getValue("tasksPerPage", "5"));
 		boolean showCompleted = Boolean.parseBoolean(preferences.getValue("showCompleted", "true"));
 		
@@ -56,23 +58,35 @@ public class TaskListMVCRenderCommand implements MVCRenderCommand {
 		//// 1. LEO LAS PREFERENCIAS DE CONFIGURACIÓN DEL SYSTEM --> LAS GUARDO EN EL
 		//// REQUEST PARA HACERLAS ACCESIBLES DESDE LA JSP
 		try {
-			SystemConfig config = _configurationProvider.getSystemConfiguration(SystemConfig.class);
+			SystemConfig systemConfig = _configurationProvider.getSystemConfiguration(SystemConfig.class);
 
-			renderRequest.setAttribute(SystemConfig.class.getName(), config);
+			renderRequest.setAttribute(SystemConfig.class.getName(), systemConfig);
 		} catch (Exception e) {
 			_log.error("Error obteniendo configuración a nivel de sistema", e);
 			e.printStackTrace();
 		}
 		
 		
-		
-		
-		
+		//2. PREFERENCIAS DE CONFIGURACIÓN A NIVEL DE SITE. EN LA DOCUMENTACIÓN INYECTAN CON @REFERENCE PORTAL PARA OBTENER EL GROUPID PERO COMO YO LO TENÍA SACADO CON THEMEDISPPLAY VOY A USAR MI MÉTODO
+		// La UI de configuracion GROUP esta en Site Settings. 
 	
-
 		// DATOS DE CONTEXTO
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		long groupId = themeDisplay.getScopeGroupId();
+		
+		//LEO PREFERENCIAS Y LAS IYECTO AL REQUEST
+		try {
+	    GroupConfig groupConfig =
+	            _configurationProvider.getGroupConfiguration(     
+	                GroupConfig.class, groupId);
+	     
+	    renderRequest.setAttribute(GroupConfig.class.getName(), groupConfig);
+		}catch (Exception e) {
+			_log.error("Error obteniendo configuración a nivel de site", e);
+			e.printStackTrace();
+		}
+		
+		
 
 		// PARÁMETROS DE BÚSQUEDA
 		String keywords = ParamUtil.getString(renderRequest, "keywords", StringPool.BLANK);
