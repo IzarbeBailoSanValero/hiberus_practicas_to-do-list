@@ -1,0 +1,4 @@
+Bundle-Name: task-scheduler-web
+Bundle-SymbolicName: task.scheduler.web
+Bundle-Version: 1.0.0
+Export-Package: task.scheduler.web.constants
