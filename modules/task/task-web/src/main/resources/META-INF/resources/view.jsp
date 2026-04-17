@@ -18,7 +18,7 @@ if (systemConfig != null) {
 
 <h4>Escrito desde System settings: <%= myParagraphFromSystem %></h4>
 <hr>
-<h4>Escrito desde System settings: <%= myParagraphFromGroup %></h4>
+<h4>Escrito desde group settings: <%= myParagraphFromGroup %></h4>
 <hr>
 
 <!-- RECUPERAR DATOS DEL RENDERCOMMAND + LEER LAS PREFERENCIAS DEL SITE (lo casteo porque devuelve Object)-->
