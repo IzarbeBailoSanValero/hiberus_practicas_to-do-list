@@ -9,5 +9,7 @@ create table TEST_Task (
 	title VARCHAR(75) null,
 	description VARCHAR(75) null,
 	completed BOOLEAN,
-	dueDate DATE null
+	dueDate DATE null,
+	active_ BOOLEAN,
+	completedDate DATE null
 );

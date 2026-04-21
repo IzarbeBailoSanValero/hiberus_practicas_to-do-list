@@ -61,7 +61,7 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(23);
+		StringBundler sb = new StringBundler(27);
 
 		sb.append("{taskId=");
 		sb.append(taskId);
@@ -85,6 +85,10 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 		sb.append(completed);
 		sb.append(", dueDate=");
 		sb.append(dueDate);
+		sb.append(", active=");
+		sb.append(active);
+		sb.append(", completedDate=");
+		sb.append(completedDate);
 		sb.append("}");
 
 		return sb.toString();
@@ -143,6 +147,15 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 			taskImpl.setDueDate(new Date(dueDate));
 		}
 
+		taskImpl.setActive(active);
+
+		if (completedDate == Long.MIN_VALUE) {
+			taskImpl.setCompletedDate(null);
+		}
+		else {
+			taskImpl.setCompletedDate(new Date(completedDate));
+		}
+
 		taskImpl.resetOriginalValues();
 
 		return taskImpl;
@@ -165,6 +178,9 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 
 		completed = objectInput.readBoolean();
 		dueDate = objectInput.readLong();
+
+		active = objectInput.readBoolean();
+		completedDate = objectInput.readLong();
 	}
 
 	@Override
@@ -203,6 +219,9 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 
 		objectOutput.writeBoolean(completed);
 		objectOutput.writeLong(dueDate);
+
+		objectOutput.writeBoolean(active);
+		objectOutput.writeLong(completedDate);
 	}
 
 	public long taskId;
@@ -216,5 +235,7 @@ public class TaskCacheModel implements CacheModel<Task>, Externalizable {
 	public String description;
 	public boolean completed;
 	public long dueDate;
+	public boolean active;
+	public long completedDate;
 
 }

@@ -47,13 +47,13 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 		if (!themeDisplay.isSignedIn() || !themeDisplay.getPermissionChecker().isOmniadmin()) {
 			SessionErrors.add(actionRequest, "error.permission");
 			hideDefaultErrorMessage(actionRequest);
-			// en la jsp tendré que poner <liferay-ui:error key="permission-error"
-			// message="No tienes permisos para acceder a esta sección." />
+			// en la jsp tendre que poner liferay-ui:error key="permission-error"
+			// message="No tienes permisos para acceder a esta seccion." 
 			return;
 		}
 
 		// CONTEXTO
-		// Crear DateFormat correcto según la locale del usuario
+		// Crear DateFormat correcto segun la locale del usuario
 		DateFormat dateFormat = DateFormatFactoryUtil.getDate(themeDisplay.getLocale());
 
 		long groupId = themeDisplay.getScopeGroupId();
@@ -70,7 +70,7 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 		long taskUserId = ParamUtil.getLong(actionRequest, "assignedUserId", 0);
 		 _log.info(taskUserId);
 		
-		// Validación titulo
+		// Validacion titulo
 		if (taskTitle.isEmpty()) {
 			SessionErrors.add(actionRequest, "error.title.required");
 			hideDefaultErrorMessage(actionRequest);

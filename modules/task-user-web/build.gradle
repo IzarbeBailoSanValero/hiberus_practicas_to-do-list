@@ -6,4 +6,6 @@ dependencies {
 	compileOnly project(":modules:task:task-api")
 	
 	compileOnly project(":modules:task:task-service")
+	
+
 }

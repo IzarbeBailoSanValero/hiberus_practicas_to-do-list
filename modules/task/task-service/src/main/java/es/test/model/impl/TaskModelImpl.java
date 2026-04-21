@@ -74,7 +74,8 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
 		{"modifiedDate", Types.TIMESTAMP}, {"title", Types.VARCHAR},
 		{"description", Types.VARCHAR}, {"completed", Types.BOOLEAN},
-		{"dueDate", Types.TIMESTAMP}
+		{"dueDate", Types.TIMESTAMP}, {"active_", Types.BOOLEAN},
+		{"completedDate", Types.TIMESTAMP}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -92,10 +93,12 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		TABLE_COLUMNS_MAP.put("description", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("completed", Types.BOOLEAN);
 		TABLE_COLUMNS_MAP.put("dueDate", Types.TIMESTAMP);
+		TABLE_COLUMNS_MAP.put("active_", Types.BOOLEAN);
+		TABLE_COLUMNS_MAP.put("completedDate", Types.TIMESTAMP);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table TEST_Task (taskId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(75) null,description VARCHAR(75) null,completed BOOLEAN,dueDate DATE null)";
+		"create table TEST_Task (taskId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,title VARCHAR(75) null,description VARCHAR(75) null,completed BOOLEAN,dueDate DATE null,active_ BOOLEAN,completedDate DATE null)";
 
 	public static final String TABLE_SQL_DROP = "drop table TEST_Task";
 
@@ -113,32 +116,38 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long COMPLETED_COLUMN_BITMASK = 1L;
+	public static final long ACTIVE_COLUMN_BITMASK = 1L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long GROUPID_COLUMN_BITMASK = 2L;
+	public static final long COMPLETED_COLUMN_BITMASK = 2L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long TITLE_COLUMN_BITMASK = 4L;
+	public static final long GROUPID_COLUMN_BITMASK = 4L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long USERID_COLUMN_BITMASK = 8L;
+	public static final long TITLE_COLUMN_BITMASK = 8L;
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link #getColumnBitmask(String)}
+	 */
+	@Deprecated
+	public static final long USERID_COLUMN_BITMASK = 16L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *		#getColumnBitmask(String)}
 	 */
 	@Deprecated
-	public static final long TASKID_COLUMN_BITMASK = 16L;
+	public static final long TASKID_COLUMN_BITMASK = 32L;
 
 	/**
 	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
@@ -278,6 +287,12 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		attributeGetterFunctions.put("dueDate", Task::getDueDate);
 		attributeSetterBiConsumers.put(
 			"dueDate", (BiConsumer<Task, Date>)Task::setDueDate);
+		attributeGetterFunctions.put("active", Task::getActive);
+		attributeSetterBiConsumers.put(
+			"active", (BiConsumer<Task, Boolean>)Task::setActive);
+		attributeGetterFunctions.put("completedDate", Task::getCompletedDate);
+		attributeSetterBiConsumers.put(
+			"completedDate", (BiConsumer<Task, Date>)Task::setCompletedDate);
 
 		_attributeGetterFunctions = Collections.unmodifiableMap(
 			attributeGetterFunctions);
@@ -518,6 +533,49 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_dueDate = dueDate;
 	}
 
+	@Override
+	public boolean getActive() {
+		return _active;
+	}
+
+	@Override
+	public boolean isActive() {
+		return _active;
+	}
+
+	@Override
+	public void setActive(boolean active) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_active = active;
+	}
+
+	/**
+	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
+	 *             #getColumnOriginalValue(String)}
+	 */
+	@Deprecated
+	public boolean getOriginalActive() {
+		return GetterUtil.getBoolean(
+			this.<Boolean>getColumnOriginalValue("active_"));
+	}
+
+	@Override
+	public Date getCompletedDate() {
+		return _completedDate;
+	}
+
+	@Override
+	public void setCompletedDate(Date completedDate) {
+		if (_columnOriginalValues == Collections.EMPTY_MAP) {
+			_setColumnOriginalValues();
+		}
+
+		_completedDate = completedDate;
+	}
+
 	public long getColumnBitmask() {
 		if (_columnBitmask > 0) {
 			return _columnBitmask;
@@ -585,6 +643,8 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		taskImpl.setDescription(getDescription());
 		taskImpl.setCompleted(isCompleted());
 		taskImpl.setDueDate(getDueDate());
+		taskImpl.setActive(isActive());
+		taskImpl.setCompletedDate(getCompletedDate());
 
 		taskImpl.resetOriginalValues();
 
@@ -609,6 +669,9 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		taskImpl.setCompleted(
 			this.<Boolean>getColumnOriginalValue("completed"));
 		taskImpl.setDueDate(this.<Date>getColumnOriginalValue("dueDate"));
+		taskImpl.setActive(this.<Boolean>getColumnOriginalValue("active_"));
+		taskImpl.setCompletedDate(
+			this.<Date>getColumnOriginalValue("completedDate"));
 
 		return taskImpl;
 	}
@@ -747,6 +810,17 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 			taskCacheModel.dueDate = Long.MIN_VALUE;
 		}
 
+		taskCacheModel.active = isActive();
+
+		Date completedDate = getCompletedDate();
+
+		if (completedDate != null) {
+			taskCacheModel.completedDate = completedDate.getTime();
+		}
+		else {
+			taskCacheModel.completedDate = Long.MIN_VALUE;
+		}
+
 		return taskCacheModel;
 	}
 
@@ -819,8 +893,12 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 	private String _description;
 	private boolean _completed;
 	private Date _dueDate;
+	private boolean _active;
+	private Date _completedDate;
 
 	public <T> T getColumnValue(String columnName) {
+		columnName = _attributeNames.getOrDefault(columnName, columnName);
+
 		Function<Task, Object> function = _attributeGetterFunctions.get(
 			columnName);
 
@@ -858,6 +936,18 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		_columnOriginalValues.put("description", _description);
 		_columnOriginalValues.put("completed", _completed);
 		_columnOriginalValues.put("dueDate", _dueDate);
+		_columnOriginalValues.put("active_", _active);
+		_columnOriginalValues.put("completedDate", _completedDate);
+	}
+
+	private static final Map<String, String> _attributeNames;
+
+	static {
+		Map<String, String> attributeNames = new HashMap<>();
+
+		attributeNames.put("active_", "active");
+
+		_attributeNames = Collections.unmodifiableMap(attributeNames);
 	}
 
 	private transient Map<String, Object> _columnOriginalValues;
@@ -892,6 +982,10 @@ public class TaskModelImpl extends BaseModelImpl<Task> implements TaskModel {
 		columnBitmasks.put("completed", 512L);
 
 		columnBitmasks.put("dueDate", 1024L);
+
+		columnBitmasks.put("active_", 2048L);
+
+		columnBitmasks.put("completedDate", 4096L);
 
 		_columnBitmasks = Collections.unmodifiableMap(columnBitmasks);
 	}

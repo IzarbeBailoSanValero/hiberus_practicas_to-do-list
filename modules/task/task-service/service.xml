@@ -29,6 +29,8 @@
 		<column name="description" type="String" />
 		<column name="completed" type="boolean" />
 		<column name="dueDate" type="Date" />
+		<column name="active" type="boolean" />
+		<column name="completedDate" type="Date" />
 
 
 
@@ -58,12 +60,14 @@
 		<finder name="GroupIdUserId" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="userId" />
+			<finder-column name="active" />
 		</finder>
 		
 			<finder name="GroupIdUserIdTitle" return-type="Collection">
 			<finder-column name="groupId" />
 			<finder-column name="userId" />
 			<finder-column name="title" />
+			<finder-column name="active" />
 		</finder>
 		
 

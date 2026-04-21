@@ -19,9 +19,12 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Validator;
@@ -53,10 +56,10 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 
 	@Reference
 	private GroupLocalService _groupLocalService;
-	
-/**
- * CREAR TAREA
- */
+
+	/**
+	 * CREAR TAREA - setteo a true active
+	 */
 	public Task addTask(long groupId, long assignedUserId, ServiceContext serviceContext, String title,
 			String description, Date dueDate) throws PortalException {
 
@@ -91,70 +94,67 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		task.setDescription(description);
 		task.setDueDate(dueDate);
 		task.setCompleted(false);
+		task.setCompletedDate(null);
+		task.setActive(true);
 
 		return taskPersistence.update(task);
 	}
 
-	
 	@Override
 	public Task addTask(long groupId, ServiceContext serviceContext, String title, String description, Date dueDate)
 			throws PortalException {
-		 Group group = _groupLocalService.getGroup(groupId);
+		Group group = _groupLocalService.getGroup(groupId);
 
-		    if (Validator.isNull(title)) {
-		        throw new PortalException("el título es obligatorio");
-		    }
+		if (Validator.isNull(title)) {
+			throw new PortalException("el título es obligatorio");
+		}
 
-		    // usuario creador
-		    User user = userLocalService.getUser(serviceContext.getUserId());
+		// usuario creador
+		User user = userLocalService.getUser(serviceContext.getUserId());
 
-		    long taskId = counterLocalService.increment(Task.class.getName());
+		long taskId = counterLocalService.increment(Task.class.getName());
 
-		    Task task = taskPersistence.create(taskId);
+		Task task = taskPersistence.create(taskId);
 
-		    task.setGroupId(groupId);
-		    task.setCompanyId(group.getCompanyId());
+		task.setGroupId(groupId);
+		task.setCompanyId(group.getCompanyId());
 
-		 
-		    task.setUserId(user.getUserId());
-		    task.setUserName(user.getFullName());
+		task.setUserId(user.getUserId());
+		task.setUserName(user.getFullName());
 
-		    task.setCreateDate(serviceContext.getCreateDate(new Date()));
-		    task.setModifiedDate(serviceContext.getModifiedDate(new Date()));
+		task.setCreateDate(serviceContext.getCreateDate(new Date()));
+		task.setModifiedDate(serviceContext.getModifiedDate(new Date()));
 
-		    task.setTitle(title);
-		    task.setDescription(description);
-		    task.setDueDate(dueDate);
-		    task.setCompleted(false);
+		task.setTitle(title);
+		task.setDescription(description);
+		task.setDueDate(dueDate);
+		task.setCompleted(false);
+		task.setCompletedDate(null);
+		task.setActive(true);
 
-		    return taskPersistence.update(task);
+		return taskPersistence.update(task);
 	}
 
-	
-	
-	
 	/**
 	 * COMPLETAR TAREA
 	 */
 	public Task completeTask(long taskId, ServiceContext serviceContext) throws PortalException {
 		// valido que tarea existe
-		Task task = taskPersistence.findByPrimaryKey(taskId);
+		Task task = taskPersistence.fetchByPrimaryKey(taskId);
+
+		if (task == null) {
+		    throw new PortalException("Task no existe");
+		}
 
 		// actualizo campos pertinentes --> updateo
 		task.setCompleted(true);
-		task.setModifiedDate(serviceContext.getModifiedDate(new Date())); // new Date crea con la fecha y hora actuales
-																			// //getModifiedDate(Date date) devuelve:La
-																			// fecha pasada como parámetro si no hay una
-																			// fecha de modificación definida en el
-																			// ServiceContext.
+		task.setModifiedDate(new Date());
+		task.setCompletedDate(new Date());
 		return taskPersistence.update(task);
 	}
 
-	
-
-	
 	/**
-	 * BUSCAR TODOS POR GROUP  (FINDER) --ADMIN
+	 * BUSCAR TODOS POR GROUP (FINDER) --ADMIN
 	 */
 
 	public List<Task> getTasksByGroup(long groupId, int start, int end) {
@@ -165,26 +165,21 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		return taskPersistence.countByGroupId(groupId);
 	}
 
-
 	public List<Task> getTaskByGroup(long groupId) {
 		return taskPersistence.findByGroupId(groupId);
 	}
-	
-	
-	
+
 	/**
 	 * BUSCAR TODOS POR GROUPID_USERID (FINDER) --USER
 	 */
 	public List<Task> findByGroupIdUserId(long groupId, long userId, int start, int end) {
-		return taskPersistence.findByGroupIdUserId(groupId, userId, start, end);
+		return taskPersistence.findByGroupIdUserId(groupId, userId, true, start, end);
 	}
 
 	public int getTasksCountByGroupIdUserId(long groupId, long userId) {
-		return taskPersistence.countByGroupIdUserId(groupId, userId);
+		return taskPersistence.countByGroupIdUserId(groupId, userId, true);
 	}
 
-	
-	
 	/**
 	 * BUSQUEDA EXACTA X TITULO (FINDER) --ADMIN
 	 */
@@ -206,18 +201,17 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 	 * BUSQUEDA EXACTA X TITULO + USER (FINDER) --USER
 	 */
 	public List<Task> getTasksByTitleAndUser(long groupId, long userId, String title, int start, int end) {
-		return taskPersistence.findByGroupIdUserIdTitle(groupId, userId, title, start, end);
+		return taskPersistence.findByGroupIdUserIdTitle(groupId, userId, title, true, start, end);
 	}
 
 	public int getTasksCountByTitleAndUser(long groupId, long userId, String title) {
-		return taskPersistence.countByGroupIdUserIdTitle(groupId, userId, title);
+		return taskPersistence.countByGroupIdUserIdTitle(groupId, userId, title, true);
 	}
 
 	public List<Task> getTasksByTitleAndUser(long groupId, long userId, String title) {
-		return taskPersistence.findByGroupIdUserIdTitle(groupId, userId, title);
+		return taskPersistence.findByGroupIdUserIdTitle(groupId, userId, title, true);
 	}
 
-	
 	/**
 	 * BUSQUEDA FLEXIBLE X TITULO (DYNAMIC QUERY) --ADMIN + USER
 	 * 
@@ -250,11 +244,10 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		}
 
 		DynamicQuery query = _buildKeywordsQuery(groupId, userId, keywords);
-		return (int) taskPersistence.countWithDynamicQuery(query); //Returns the number of rows that match the dynamic query.
+		return (int) taskPersistence.countWithDynamicQuery(query); // Returns the number of rows that match the dynamic
+																	// query.
 	}
 
-	
-	
 	@Override
 	public List<Task> getTasksByKeywords(long groupId, String keywords, int start, int end) {
 
@@ -280,20 +273,29 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		return 0;
 	}
 
-	
 	/**
 	 * PRIVADO, CONSTRUYE CONSULTA QUERY PARA DQ
+	 * 
+	 * @throws Exception
 	 */
 	private DynamicQuery _buildKeywordsQuery(long groupId, Long userId, String keywords) {
 
 		DynamicQuery query = DynamicQueryFactoryUtil.forClass(Task.class, getClass().getClassLoader());
 
+		PermissionChecker permissionChecker = PermissionThreadLocal.getPermissionChecker();
+
 		// obligado
 		Property groupIdProperty = PropertyFactoryUtil.forName("groupId");
 		query.add(groupIdProperty.eq(groupId));
 
+		//permisos
+		if (!permissionChecker.isOmniadmin()) {
+			query.add(RestrictionsFactoryUtil.eq("active", true));
+		}
+		
 		// opcional
 		if (userId != null) {
+
 			query.add(PropertyFactoryUtil.forName("userId").eq(userId));
 		}
 
@@ -305,7 +307,28 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 		return query;
 	}
 
-	
+	/**
+	 * BUSQUEDA FLEXIBLE - TAREAS A DESACTIVAR (DYNAMIC QUERY) --ESTAN ACTIVAS +
+	 * ESTaN COMPLETADAS + HACE MAS DE 15 DiAS
+	 */
+	private DynamicQuery _buildTasksToDesactivateQuery(Date cutoffDate) {
+		// CONSTRUYO LA QUERY
+
+		DynamicQuery query = DynamicQueryFactoryUtil.forClass(Task.class, getClass().getClassLoader());
+
+		query.add(RestrictionsFactoryUtil.eq("completed", true));
+		query.add(RestrictionsFactoryUtil.eq("active", true));
+		query.add(RestrictionsFactoryUtil.isNotNull("completedDate"));
+		query.add(RestrictionsFactoryUtil.le("completedDate", cutoffDate));
+
+		return query;
+	}
+
+	public List<Task> getTasksToDesactivate(Date cutoffDate) {
+		DynamicQuery query = _buildTasksToDesactivateQuery(cutoffDate);
+		return taskPersistence.findWithDynamicQuery(query);
+	}
+
 	
 
 }

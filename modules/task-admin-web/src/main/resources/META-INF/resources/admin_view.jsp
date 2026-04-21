@@ -144,6 +144,23 @@
 				</span>
 
 			</liferay-ui:search-container-column-text>
+			
+			
+			
+			
+		
+			<liferay-ui:search-container-column-text name="task.activation">
+
+				<span
+					class="label <%=task.isActive() ? "label-success" : "label-warning"%>">
+					<liferay-ui:message
+						key='<%=task.isActive() ? "yes" : "no"%>' />
+				</span>
+
+			</liferay-ui:search-container-column-text>
+
+
+
 
 
 			<liferay-ui:search-container-column-text name="task.actions">

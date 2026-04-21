@@ -47,7 +47,7 @@ public class TaskLocalServiceUtil {
 	 */
 
 	/**
-	 * CREAR TAREA
+	 * CREAR TAREA - setteo a true active
 	 */
 	public static Task addTask(
 			long groupId, long assignedUserId,
@@ -327,7 +327,7 @@ public class TaskLocalServiceUtil {
 	}
 
 	/**
-	 * BUSCAR TODOS POR GROUP  (FINDER) --ADMIN
+	 * BUSCAR TODOS POR GROUP (FINDER) --ADMIN
 	 */
 	public static List<Task> getTasksByGroup(long groupId, int start, int end) {
 		return getService().getTasksByGroup(groupId, start, end);
@@ -400,6 +400,10 @@ public class TaskLocalServiceUtil {
 		long groupId, long userId, String title) {
 
 		return getService().getTasksCountByTitleAndUser(groupId, userId, title);
+	}
+
+	public static List<Task> getTasksToDesactivate(java.util.Date cutoffDate) {
+		return getService().getTasksToDesactivate(cutoffDate);
 	}
 
 	/**

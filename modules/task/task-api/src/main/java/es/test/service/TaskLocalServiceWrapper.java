@@ -35,7 +35,7 @@ public class TaskLocalServiceWrapper
 	}
 
 	/**
-	 * CREAR TAREA
+	 * CREAR TAREA - setteo a true active
 	 */
 	@Override
 	public es.test.model.Task addTask(
@@ -358,7 +358,7 @@ public class TaskLocalServiceWrapper
 	}
 
 	/**
-	 * BUSCAR TODOS POR GROUP  (FINDER) --ADMIN
+	 * BUSCAR TODOS POR GROUP (FINDER) --ADMIN
 	 */
 	@Override
 	public java.util.List<es.test.model.Task> getTasksByGroup(
@@ -448,6 +448,13 @@ public class TaskLocalServiceWrapper
 
 		return _taskLocalService.getTasksCountByTitleAndUser(
 			groupId, userId, title);
+	}
+
+	@Override
+	public java.util.List<es.test.model.Task> getTasksToDesactivate(
+		java.util.Date cutoffDate) {
+
+		return _taskLocalService.getTasksToDesactivate(cutoffDate);
 	}
 
 	/**

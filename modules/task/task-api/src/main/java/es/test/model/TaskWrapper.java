@@ -52,6 +52,8 @@ public class TaskWrapper
 		attributes.put("description", getDescription());
 		attributes.put("completed", isCompleted());
 		attributes.put("dueDate", getDueDate());
+		attributes.put("active", isActive());
+		attributes.put("completedDate", getCompletedDate());
 
 		return attributes;
 	}
@@ -123,11 +125,33 @@ public class TaskWrapper
 		if (dueDate != null) {
 			setDueDate(dueDate);
 		}
+
+		Boolean active = (Boolean)attributes.get("active");
+
+		if (active != null) {
+			setActive(active);
+		}
+
+		Date completedDate = (Date)attributes.get("completedDate");
+
+		if (completedDate != null) {
+			setCompletedDate(completedDate);
+		}
 	}
 
 	@Override
 	public Task cloneWithOriginalValues() {
 		return wrap(model.cloneWithOriginalValues());
+	}
+
+	/**
+	 * Returns the active of this task.
+	 *
+	 * @return the active of this task
+	 */
+	@Override
+	public boolean getActive() {
+		return model.getActive();
 	}
 
 	/**
@@ -148,6 +172,16 @@ public class TaskWrapper
 	@Override
 	public boolean getCompleted() {
 		return model.getCompleted();
+	}
+
+	/**
+	 * Returns the completed date of this task.
+	 *
+	 * @return the completed date of this task
+	 */
+	@Override
+	public Date getCompletedDate() {
+		return model.getCompletedDate();
 	}
 
 	/**
@@ -261,6 +295,16 @@ public class TaskWrapper
 	}
 
 	/**
+	 * Returns <code>true</code> if this task is active.
+	 *
+	 * @return <code>true</code> if this task is active; <code>false</code> otherwise
+	 */
+	@Override
+	public boolean isActive() {
+		return model.isActive();
+	}
+
+	/**
 	 * Returns <code>true</code> if this task is completed.
 	 *
 	 * @return <code>true</code> if this task is completed; <code>false</code> otherwise
@@ -273,6 +317,16 @@ public class TaskWrapper
 	@Override
 	public void persist() {
 		model.persist();
+	}
+
+	/**
+	 * Sets whether this task is active.
+	 *
+	 * @param active the active of this task
+	 */
+	@Override
+	public void setActive(boolean active) {
+		model.setActive(active);
 	}
 
 	/**
@@ -293,6 +347,16 @@ public class TaskWrapper
 	@Override
 	public void setCompleted(boolean completed) {
 		model.setCompleted(completed);
+	}
+
+	/**
+	 * Sets the completed date of this task.
+	 *
+	 * @param completedDate the completed date of this task
+	 */
+	@Override
+	public void setCompletedDate(Date completedDate) {
+		model.setCompletedDate(completedDate);
 	}
 
 	/**

@@ -66,7 +66,7 @@ public interface TaskLocalService
 	 */
 
 	/**
-	 * CREAR TAREA
+	 * CREAR TAREA - setteo a true active
 	 */
 	public Task addTask(
 			long groupId, long assignedUserId, ServiceContext serviceContext,
@@ -286,7 +286,7 @@ public interface TaskLocalService
 	public List<Task> getTasks(int start, int end);
 
 	/**
-	 * BUSCAR TODOS POR GROUP  (FINDER) --ADMIN
+	 * BUSCAR TODOS POR GROUP (FINDER) --ADMIN
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Task> getTasksByGroup(long groupId, int start, int end);
@@ -340,6 +340,9 @@ public interface TaskLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getTasksCountByTitleAndUser(
 		long groupId, long userId, String title);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Task> getTasksToDesactivate(Date cutoffDate);
 
 	/**
 	 * Updates the task in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.

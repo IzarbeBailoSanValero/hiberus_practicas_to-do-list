@@ -54,6 +54,10 @@ public class TaskTable extends BaseTable<TaskTable> {
 		"completed", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
 	public final Column<TaskTable, Date> dueDate = createColumn(
 		"dueDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
+	public final Column<TaskTable, Boolean> active = createColumn(
+		"active_", Boolean.class, Types.BOOLEAN, Column.FLAG_DEFAULT);
+	public final Column<TaskTable, Date> completedDate = createColumn(
+		"completedDate", Date.class, Types.TIMESTAMP, Column.FLAG_DEFAULT);
 
 	private TaskTable() {
 		super("TEST_Task", TaskTable::new);

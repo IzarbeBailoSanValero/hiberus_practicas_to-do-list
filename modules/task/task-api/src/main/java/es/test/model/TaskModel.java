@@ -249,6 +249,41 @@ public interface TaskModel extends BaseModel<Task>, GroupedModel, ShardedModel {
 	 */
 	public void setDueDate(Date dueDate);
 
+	/**
+	 * Returns the active of this task.
+	 *
+	 * @return the active of this task
+	 */
+	public boolean getActive();
+
+	/**
+	 * Returns <code>true</code> if this task is active.
+	 *
+	 * @return <code>true</code> if this task is active; <code>false</code> otherwise
+	 */
+	public boolean isActive();
+
+	/**
+	 * Sets whether this task is active.
+	 *
+	 * @param active the active of this task
+	 */
+	public void setActive(boolean active);
+
+	/**
+	 * Returns the completed date of this task.
+	 *
+	 * @return the completed date of this task
+	 */
+	public Date getCompletedDate();
+
+	/**
+	 * Sets the completed date of this task.
+	 *
+	 * @param completedDate the completed date of this task
+	 */
+	public void setCompletedDate(Date completedDate);
+
 	@Override
 	public Task cloneWithOriginalValues();
 
