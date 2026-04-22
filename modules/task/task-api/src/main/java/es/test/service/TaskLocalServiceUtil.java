@@ -402,6 +402,30 @@ public class TaskLocalServiceUtil {
 		return getService().getTasksCountByTitleAndUser(groupId, userId, title);
 	}
 
+	public static List<Task> getTasksOverdue(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return getService().getTasksOverdue(cutoffDate, userId, groupId);
+	}
+
+	public static long getTasksOverdueCount(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return getService().getTasksOverdueCount(cutoffDate, userId, groupId);
+	}
+
+	public static List<Task> getTasksPending(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return getService().getTasksPending(cutoffDate, userId, groupId);
+	}
+
+	public static long getTasksPendingCount(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return getService().getTasksPendingCount(cutoffDate, userId, groupId);
+	}
+
 	public static List<Task> getTasksToDesactivate(java.util.Date cutoffDate) {
 		return getService().getTasksToDesactivate(cutoffDate);
 	}

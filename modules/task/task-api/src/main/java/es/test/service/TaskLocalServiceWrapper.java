@@ -451,6 +451,36 @@ public class TaskLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<es.test.model.Task> getTasksOverdue(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return _taskLocalService.getTasksOverdue(cutoffDate, userId, groupId);
+	}
+
+	@Override
+	public long getTasksOverdueCount(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return _taskLocalService.getTasksOverdueCount(
+			cutoffDate, userId, groupId);
+	}
+
+	@Override
+	public java.util.List<es.test.model.Task> getTasksPending(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return _taskLocalService.getTasksPending(cutoffDate, userId, groupId);
+	}
+
+	@Override
+	public long getTasksPendingCount(
+		java.util.Date cutoffDate, long userId, long groupId) {
+
+		return _taskLocalService.getTasksPendingCount(
+			cutoffDate, userId, groupId);
+	}
+
+	@Override
 	public java.util.List<es.test.model.Task> getTasksToDesactivate(
 		java.util.Date cutoffDate) {
 

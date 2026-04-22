@@ -1,0 +1,8 @@
+Bundle-Name: task-theme-context
+Bundle-SymbolicName: task.theme.context
+Bundle-Version: 1.0.0
+Export-Package: task.theme.context.constants
+
+
+# No exportamos ningún paquete: este módulo solo consume APIs
+# de task-api y de Liferay kernel.

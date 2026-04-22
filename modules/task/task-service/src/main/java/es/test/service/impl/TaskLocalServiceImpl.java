@@ -330,5 +330,71 @@ public class TaskLocalServiceImpl extends TaskLocalServiceBaseImpl {
 	}
 
 	
+	
+	
+	/**
+	 * BUSQUEDA FLEXIBLE - TAREAS PENDIENTES O QUE SE QUEDARON SIN HACER
+	 */
 
-}
+	    //  OVERDUE
+	    private DynamicQuery _buildTasksOverdue(Date cutoffDate, long userId, long groupId) {
+
+	        DynamicQuery query = DynamicQueryFactoryUtil.forClass(
+	            Task.class, getClass().getClassLoader());
+
+	        query.add(RestrictionsFactoryUtil.eq("completed", false));
+	        query.add(RestrictionsFactoryUtil.isNotNull("dueDate"));     
+	        query.add(RestrictionsFactoryUtil.lt("dueDate", cutoffDate)); 
+	        query.add(PropertyFactoryUtil.forName("groupId").eq(groupId));
+	        if (userId > 0) {
+	            query.add(PropertyFactoryUtil.forName("userId").eq(userId));
+	        }
+
+	        return query;
+	    }
+
+	    public List<Task> getTasksOverdue(Date cutoffDate, long userId, long groupId) {
+	        DynamicQuery query = _buildTasksOverdue(cutoffDate, userId, groupId);
+	        return taskPersistence.findWithDynamicQuery(query);
+	    }
+
+	    public long getTasksOverdueCount(Date cutoffDate, long userId, long groupId) {
+	        DynamicQuery query = _buildTasksOverdue(cutoffDate, userId, groupId);
+	        return taskPersistence.countWithDynamicQuery(query);
+	    }
+
+
+	 
+	    //  PENDING
+
+	    private DynamicQuery _buildTasksPending(Date cutoffDate, long userId, long groupId) {
+
+	        DynamicQuery query = DynamicQueryFactoryUtil.forClass(
+	            Task.class, getClass().getClassLoader());
+
+	        query.add(RestrictionsFactoryUtil.eq("completed", false));
+	        query.add(RestrictionsFactoryUtil.isNotNull("dueDate"));  
+	        query.add(RestrictionsFactoryUtil.ge("dueDate", cutoffDate));
+	        query.add(PropertyFactoryUtil.forName("groupId").eq(groupId));
+	        if (userId > 0) {
+	            query.add(PropertyFactoryUtil.forName("userId").eq(userId));
+	        }
+
+	        return query;
+	    }
+
+	    public List<Task> getTasksPending(Date cutoffDate, long userId, long groupId) {
+	        DynamicQuery query = _buildTasksPending(cutoffDate, userId, groupId);
+	        return taskPersistence.findWithDynamicQuery(query);
+	    }
+
+	    public long getTasksPendingCount(Date cutoffDate, long userId, long groupId) {
+	        DynamicQuery query = _buildTasksPending(cutoffDate, userId, groupId);
+	        return taskPersistence.countWithDynamicQuery(query);
+	    }
+
+
+
+	  
+	}
+

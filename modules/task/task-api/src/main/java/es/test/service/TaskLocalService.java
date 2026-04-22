@@ -342,6 +342,22 @@ public interface TaskLocalService
 		long groupId, long userId, String title);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Task> getTasksOverdue(
+		Date cutoffDate, long userId, long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getTasksOverdueCount(
+		Date cutoffDate, long userId, long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<Task> getTasksPending(
+		Date cutoffDate, long userId, long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getTasksPendingCount(
+		Date cutoffDate, long userId, long groupId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<Task> getTasksToDesactivate(Date cutoffDate);
 
 	/**
