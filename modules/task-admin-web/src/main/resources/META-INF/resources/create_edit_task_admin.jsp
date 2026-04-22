@@ -39,7 +39,7 @@
 				</aui:input>
 
 				<aui:input name="dueDate" label="task.due-date" type="date"
-					value="<%=(task != null) ? task.getDueDate() : ""%>">
+					value="<%=dueDateValue%>">
 				</aui:input>
 
 				<aui:select name="assignedUserId" label="user.assignation">

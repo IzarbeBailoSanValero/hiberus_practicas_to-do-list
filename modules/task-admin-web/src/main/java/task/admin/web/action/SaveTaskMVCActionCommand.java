@@ -54,7 +54,7 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 
 		// CONTEXTO
 		// Crear DateFormat correcto segun la locale del usuario
-		DateFormat dateFormat = DateFormatFactoryUtil.getDate(themeDisplay.getLocale());
+		DateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
 
 		long groupId = themeDisplay.getScopeGroupId();
 
@@ -66,7 +66,9 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 		String taskTitle = ParamUtil.getString(actionRequest, "title", StringPool.BLANK);
 		String taskDescription = ParamUtil.getString(actionRequest, "description", StringPool.BLANK);
 		Date taskDueDate = ParamUtil.getDate(actionRequest, "dueDate", dateFormat);
-		
+		String rawDueDate = ParamUtil.getString(actionRequest, "dueDate", "VACIO");
+		_log.info(">>> rawDueDate recibido: " + rawDueDate);
+		_log.info(">>> taskDueDate parseado: " + taskDueDate);
 		long taskUserId = ParamUtil.getLong(actionRequest, "assignedUserId", 0);
 		 _log.info(taskUserId);
 		
