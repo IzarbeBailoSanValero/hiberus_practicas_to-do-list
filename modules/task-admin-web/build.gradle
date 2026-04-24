@@ -9,6 +9,9 @@ dependencies {
 	
 	compileOnly project(":modules:task:task-service")
 	
+	compileOnly group: "javax.mail", name: "javax.mail-api", version: "1.6.2"
 	
-	
+	tasks.withType(JavaCompile) {
+		options.encoding = 'UTF-8'
+	}
 }

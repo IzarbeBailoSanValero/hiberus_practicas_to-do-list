@@ -1,12 +1,15 @@
 package task.admin.web.action;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -26,6 +29,7 @@ import org.osgi.service.component.annotations.Reference;
 import es.test.model.Task;
 import es.test.service.TaskLocalService;
 import task.admin.web.constants.TaskAdminWebPortletKeys;
+import task.admin.web.util.TaskEmailUtil;
 
 @Component(immediate = true, property = { "javax.portlet.name=" + TaskAdminWebPortletKeys.TASKADMINWEB,
 		"mvc.command.name=" + TaskAdminWebPortletKeys.SAVE_TASK }, service = MVCActionCommand.class)
@@ -34,8 +38,14 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private TaskLocalService _taskLocalService;
+
+	@Reference
+	private TaskEmailUtil _taskEmailUtil;
+
+	@Reference
+	private UserLocalService _userLocalService;
+
 	private static final Log _log = LogFactoryUtil.getLog(SaveTaskMVCActionCommand.class);
-	
 
 	@Override
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
@@ -48,7 +58,7 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 			SessionErrors.add(actionRequest, "error.permission");
 			hideDefaultErrorMessage(actionRequest);
 			// en la jsp tendre que poner liferay-ui:error key="permission-error"
-			// message="No tienes permisos para acceder a esta seccion." 
+			// message="No tienes permisos para acceder a esta seccion."
 			return;
 		}
 
@@ -70,8 +80,8 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 		_log.info(">>> rawDueDate recibido: " + rawDueDate);
 		_log.info(">>> taskDueDate parseado: " + taskDueDate);
 		long taskUserId = ParamUtil.getLong(actionRequest, "assignedUserId", 0);
-		 _log.info(taskUserId);
-		
+		_log.info(taskUserId);
+
 		// Validacion titulo
 		if (taskTitle.isEmpty()) {
 			SessionErrors.add(actionRequest, "error.title.required");
@@ -81,7 +91,7 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (taskId <= 0) {
-				_taskLocalService.addTask(groupId,taskUserId, serviceContext, taskTitle, taskDescription, taskDueDate);
+				_taskLocalService.addTask(groupId, taskUserId, serviceContext, taskTitle, taskDescription, taskDueDate);
 			} else {
 				Task task = _taskLocalService.fetchTask(taskId);
 
@@ -99,10 +109,37 @@ public class SaveTaskMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 			SessionMessages.add(actionRequest, "success.saved");
-			
+
+			// ENVÍO CORREO
+
+			//// caso error
+			if (taskUserId <= 0) {
+				_log.warn("El usuario " + taskUserId + " no tiene email configurado.");
+			} else {
+				try {
+
+					User user = _userLocalService.fetchUserById(taskUserId);
+
+					String userMail = user.getEmailAddress();
+					String userName = user.getFullName();
+					String taskDueDateStr = taskDueDate.toString();
+
+					if (userMail != null && !userMail.isEmpty()) {
+						_taskEmailUtil.sendEmail(actionRequest, themeDisplay, userMail, userName, taskTitle,
+								taskDescription, taskDueDateStr);
+					}
+
+				} catch (Exception e) {
+
+					_log.error("No se ha podido enviar correo electrónico, continuando con creación de tarea...");
+					//no lanzo la excepcion apra poder seguir con el flujo sin enviar email
+					
+				}
+			}
 
 			// para renderizar la lista encesito volver a ejecutar rendercommand
 			actionResponse.getRenderParameters().setValue("mvcRenderCommandName", TaskAdminWebPortletKeys.DEFAULT);
+
 		} catch (Exception e) {
 
 			if (taskId <= 0) {
