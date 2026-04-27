@@ -110,10 +110,22 @@ public class TaskEmailUtil {
 
 		
 		// --- Marcadores de etiquetas i18n ---> en todos los mails
+		 // "email.greeting" contiene "Hola, {0}" en español,
+		 // y {0} se sustituye por el nombre del usuario con format().
 		
-		 
+		 template = template.replace("[$EMAIL_GREETING$]",LanguageUtil.format(rb, "email.greeting",new String[]{userName}));
+		 template = template.replace("[$EMAIL_DUE_DATE$]",LanguageUtil.get(rb, "email.label.date"));
+		 template = template.replace("[$EMAIL_DESCRIPTION$]",LanguageUtil.get(rb, "email.label.desc"));
+		 template = template.replace("[$EMAIL_TITLE$]",LanguageUtil.get(rb, "email.label.title"));
+		 template = template.replace("[$EMAIL_SUBJECT$]",LanguageUtil.get(rb, "email.label.subject"));
+		 template = template.replace("[$EMAIL_FOOTER$]",LanguageUtil.get(rb, "email.footer"));
 		 
 		 // --- Marcadores de variables Java ---> de esta tarea ne concreto
+		 template = template.replace("[$TASK_NAME$]", taskName);
+		 template = template.replace("[$TASK_DESCRIPTION$]", taskDescription);
+		 template = template.replace("[$TASK_DUE_DATE$]", taskDueDate);
+		
+		
 		
 		
 		 return template;
